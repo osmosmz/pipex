@@ -6,7 +6,7 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/07/20 18:19:24 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/07/21 15:57:02 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ SRC			= pipex.c
 # SRC2 		= stack_util.c ft_mergesort.c parse_checks.c freeinput.c sortstacks.c pushfunctions.c \
 # 				rotatefunctions.c revrotatefunctions.c swapfunctions.c  stackfunctions.c \
 # 				parse_input.c sortstacks2.c 
-NAME 		= push_swap
+NAME 		= pipex
 OBJ1		= ${SRC:.c=.o}
 # OBJ2		= ${SRC2:.c=.o}
 LIBDIR		= libft

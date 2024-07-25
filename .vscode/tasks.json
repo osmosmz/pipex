@@ -8,7 +8,7 @@
             "args": [""],
             "group": "build",
             "problemMatcher": [
-                "$cc"
+                "$gcc"
             ],
             "detail": "Generated task for building using Makefile."
         },

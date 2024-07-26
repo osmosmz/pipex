@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["infile.txt","cat","grep 3","outfile.txt"],
+            "args": ["infile.txt","cat","grep 3","outfile"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/26 19:11:07 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/07/27 11:23:54 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,15 +107,20 @@ char	**parsepath(char **envp)
 int	pipex(t_cmd *cmds, int totalcmds)
 {
 	int		i;
-	int		pipefd[2];
+	int		pipefd[totalcmds - 1][2];
 	pid_t	pid;
 
 	i = 0;
-	if (pipe(pipefd) < 0)
+	while (i < totalcmds - 1)
 	{
-		ft_putstr_fd("Pipe:", 2);
-		return (-1);
+		if (pipe(pipefd[i]) < 0)
+		{
+			ft_putstr_fd("Pipe:", 2);
+			return (-1);
+		}
+		i++;
 	}
+	i = 0;
 	while (i < totalcmds)
 	{
 		pid = fork();
@@ -126,15 +131,26 @@ int	pipex(t_cmd *cmds, int totalcmds)
 		}
 		if (pid == 0)
 		{
-			if (cmds[i].cmdnumber != 1)
-				dup2(pipefd[STDIN_FILENO], STDIN_FILENO);
+			// todo -- allocatepipefd(cmds[i],pipefd,totalcmds-1)
+			//todo allocate fds function for the code below
+			if (cmds[i].fdin == -1)
+				dup2(pipefd[i - 1][STDIN_FILENO], STDIN_FILENO);
 			else
-				close(pipefd[STDIN_FILENO]);
-			if (cmds[i].cmdnumber != totalcmds)
-				dup2(pipefd[STDOUT_FILENO], STDOUT_FILENO);
+			{
+				dup2(cmds[i].fdin, STDIN_FILENO);
+				close(cmds[i].fdin);
+			}
+			if (cmds[i].fdout == -1)
+				dup2(pipefd[i][STDOUT_FILENO], STDOUT_FILENO);
 			else
-				close(pipefd[STDOUT_FILENO]);
+			{
+				dup2(cmds[i].fdout, STDOUT_FILENO);
+				close(cmds[i].fdout);
+			}
+			//closefds(pipe,totalcmds-1); to do close fds
 			execve(cmds[i].bin, cmds[i].argv, NULL);
+			ft_putstr_fd("Execve:", 2);
+			return (-1);
 		}
 	}
 	return (EXIT_SUCCESS);

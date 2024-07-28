@@ -6,23 +6,18 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/27 11:23:54 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/07/28 19:56:21 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include <stdio.h> // comment away after
 
-void	closefds(int *fds)
-{
-	close(fds[STDIN_FILENO]);
-	close(fds[STDOUT_FILENO]);
-}
-
 void	cleanup(t_cmd *cmds, int totalcommands, int *fds, int type)
 {
 	freecmds(cmds, totalcommands);
-	closefds(fds);
+	close(fds[STDIN_FILENO]);
+	close(fds[STDOUT_FILENO]);
 	if (type == EXIT_FAILURE)
 	{
 		ft_putstr_fd(strerror(errno), 2);
@@ -104,54 +99,87 @@ char	**parsepath(char **envp)
 	}
 	return (NULL);
 }
-int	pipex(t_cmd *cmds, int totalcmds)
+
+int	createpipe(int pipefd[][2], int totalpipes)
+{
+	int	i;
+
+	i = 0;
+	while (i < totalpipes)
+	{
+		if (pipe(pipefd[i]) < 0)
+		{
+			ft_putstr_fd("Pipe:", 2);
+			return (EXIT_FAILURE);
+		}
+		i++;
+	}
+	i = 0;
+	while (i < totalpipes)
+	{
+		ft_printf("PipeIN:%i\n", pipefd[i][0]); // rem to remove
+		ft_printf("PipeIN:%i\n", pipefd[i][1]); // rem to remove
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+void	allocatepipefd(t_cmd *cmds, int pipefd[][2])
+{
+	if (cmds->fdin == -1)
+		cmds->fdin = pipefd[cmds->cmdnumber - 2][0];
+	if (cmds->fdout == -1)
+		cmds->fdout = pipefd[cmds->cmdnumber - 1][1];
+	dup2(cmds->fdin, 0);
+	dup2(cmds->fdout, 1);
+	close(cmds->fdin);
+	close(cmds->fdout);
+}
+
+void	closefds(int pipefd[][2], int totalpipes)
+{
+	int	i;
+
+	i = 0;
+	while (i < totalpipes)
+	{
+		close(pipefd[i][0]);
+		close(pipefd[i][1]);
+		i++;
+	}
+}
+
+int	pipex(t_cmd *cmds, int totalcmds,char **envp)
 {
 	int		i;
 	int		pipefd[totalcmds - 1][2];
 	pid_t	pid;
 
 	i = 0;
-	while (i < totalcmds - 1)
-	{
-		if (pipe(pipefd[i]) < 0)
-		{
-			ft_putstr_fd("Pipe:", 2);
-			return (-1);
-		}
-		i++;
-	}
-	i = 0;
+	if (createpipe(pipefd, totalcmds - 1) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	while (i < totalcmds)
 	{
 		pid = fork();
 		if (pid < 0)
 		{
 			ft_putstr_fd("Fork:", 2);
-			return (-1);
+			return (EXIT_FAILURE);
 		}
-		if (pid == 0)
+		else if (pid == 0)
 		{
-			// todo -- allocatepipefd(cmds[i],pipefd,totalcmds-1)
-			//todo allocate fds function for the code below
-			if (cmds[i].fdin == -1)
-				dup2(pipefd[i - 1][STDIN_FILENO], STDIN_FILENO);
-			else
-			{
-				dup2(cmds[i].fdin, STDIN_FILENO);
-				close(cmds[i].fdin);
-			}
-			if (cmds[i].fdout == -1)
-				dup2(pipefd[i][STDOUT_FILENO], STDOUT_FILENO);
-			else
-			{
-				dup2(cmds[i].fdout, STDOUT_FILENO);
-				close(cmds[i].fdout);
-			}
-			//closefds(pipe,totalcmds-1); to do close fds
-			execve(cmds[i].bin, cmds[i].argv, NULL);
+			allocatepipefd(cmds + i, pipefd);
+			//	closefds(pipefd, totalcmds - 1);
+			execve(cmds[i].bin, cmds[i].argv, envp);
 			ft_putstr_fd("Execve:", 2);
-			return (-1);
+			return (EXIT_FAILURE);
 		}
+		i++;
+	}
+	closefds(pipefd, totalcmds - 1);
+	for (int i = 0; i < totalcmds; ++i)
+	{
+		wait(NULL);
 	}
 	return (EXIT_SUCCESS);
 }
@@ -204,10 +232,6 @@ void	freecmds(t_cmd *cmds, int totalcommands)
 	free(cmds);
 }
 
-void	excutecmds(void)
-{
-	// todo
-}
 void	openfiles(int *fds, char **av, int ac)
 {
 	if (ac < 5)
@@ -258,7 +282,7 @@ int	main(int ac, char **av, char **envp)
 		cleanup(cmds, totalcommands, fds, EXIT_FAILURE);
 	parsecmds(cmds, envp, av, totalcommands);
 	updatefds(cmds, fds, totalcommands);
-	if (pipex(cmds, totalcommands) < 0)
+	if (pipex(cmds, totalcommands,envp) == EXIT_FAILURE)
 		cleanup(cmds, totalcommands, fds, EXIT_FAILURE);
 	// printstruct(cmds, totalcommands);
 	cleanup(cmds, totalcommands, fds, EXIT_SUCCESS);

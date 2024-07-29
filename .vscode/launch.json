@@ -2,11 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(gdb) Attach",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/pipex",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "Debug with gdb",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["infile.txt","cat","grep 3","outfile"],
+            "args": ["infile.txt" ,"cat" ,"grep a", "outfile"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -16,9 +30,20 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "text": "-gdb-set follow-fork-mode parent",
+                    "ignoreFailures": true
+                },
+                {
+                    // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
+                    "description": "Fork follows Child process",
+                    "text": "set follow-fork-mode child",
                     "ignoreFailures": true
                 }
+                // {
+                //     // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
+                //     "description": "Fork will keep the other process attached to debugger",
+                //     "text": "set detach-on-fork off",
+                //     "ignoreFailures": true
+                // }
             ],
             "preLaunchTask": "Build using Make",
             "miDebuggerPath": "/usr/bin/gdb",

@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/29 20:06:32 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/07/29 20:15:33 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,43 +118,30 @@ int	createpipe(int *pipefd, t_cmd *cmds)
 	return (EXIT_SUCCESS);
 }
 
-void	closefds(int *pipefd)
-{
-	close(pipefd[0]);
-	close(pipefd[1]);
-}
-
-int	pipex(t_cmd *cmds, int totalcmds, char **envp)
+int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 {
 	int		i;
 	int		pipefd[2];
-	pid_t	pid;
+	pid_t	pid[totalcmds];
 
 	i = 0;
 	while (i < totalcmds)
 	{
 		if (createpipe(pipefd, cmds + i) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
-		pid = fork();
-		if (pid < 0)
+		pid[i] = fork();
+		if (pid[i] < 0)
 		{
 			ft_putstr_fd("Fork:", 2);
 			return (EXIT_FAILURE);
 		}
-		else if (pid == 0)
-		{
+		else if (pid[i] == 0)
 			execve(cmds[i].bin, cmds[i].argv, envp);
-			ft_putstr_fd("Execve:", 2);
-			return (EXIT_FAILURE);
-		}
 		i++;
 	}
-	i = 0;
-	while (i < totalcmds)
-	{
-		wait(0);
-		i++;
-	}
+	i = -1;
+	while (++i < totalcmds)
+		waitpid(pid[i], status, 0);
 	return (EXIT_SUCCESS);
 }
 
@@ -248,6 +235,7 @@ int	main(int ac, char **av, char **envp)
 	int		fds[2];
 	t_cmd	*cmds;
 	int		totalcommands;
+	int		status;
 
 	openfiles(fds, av, ac);
 	totalcommands = ac - OTHER_AC;
@@ -256,8 +244,9 @@ int	main(int ac, char **av, char **envp)
 		cleanup(cmds, totalcommands, fds, EXIT_FAILURE);
 	parsecmds(cmds, envp, av, totalcommands);
 	updatefds(cmds, fds, totalcommands);
-	if (pipex(cmds, totalcommands, envp) == EXIT_FAILURE)
+	if (pipex(cmds, totalcommands, envp, &status) == EXIT_FAILURE)
 		cleanup(cmds, totalcommands, fds, EXIT_FAILURE);
+	status = WEXITSTATUS(status);
 	// printstruct(cmds, totalcommands);
-	cleanup(cmds, totalcommands, fds, EXIT_SUCCESS);
+	cleanup(cmds, totalcommands, fds, status);
 }

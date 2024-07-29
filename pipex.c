@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/29 00:16:44 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/07/29 20:06:32 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,12 +102,7 @@ char	**parsepath(char **envp)
 
 int	createpipe(int *pipefd, t_cmd *cmds)
 {
-	if (cmds->cmdnumber == 1)
-	{
-		pipefd[0] = 0;
-		pipefd[1] = 1;
-	}
-	else if (cmds->fdin == -1)
+	if (cmds->fdin == -1)
 		cmds->fdin = pipefd[0];
 	if (pipe(pipefd) < 0)
 	{

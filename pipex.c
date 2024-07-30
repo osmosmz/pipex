@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/29 20:15:33 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/07/30 23:06:27 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,7 @@ void	getbin(t_cmd *comd, char **path)
 	}
 	if (!(comd->bin))
 	{
-		ft_printf(strerror(errno));
-		exit(EXIT_FAILURE);
+		ft_printf("%s: %s\n", comd->argv[0], "command not found");
 	}
 }
 
@@ -77,8 +76,8 @@ void	parsecmds(t_cmd *cmds, char **envp, char **av, int totalcommands)
 	while (i < totalcommands)
 	{
 		cmds[i].cmdnumber = i + 1;
-		cmds[i].fdin = -1;
-		cmds[i].fdout = -1;
+		cmds[i].fdin = -5;
+		cmds[i].fdout = -5;
 		cmds[i].argv = ft_split(av[cmds[i].cmdnumber + 1], ' ');
 		getbin(cmds + i, path);
 		i++;
@@ -102,14 +101,14 @@ char	**parsepath(char **envp)
 
 int	createpipe(int *pipefd, t_cmd *cmds)
 {
-	if (cmds->fdin == -1)
+	if (cmds->fdin == -5)
 		cmds->fdin = pipefd[0];
 	if (pipe(pipefd) < 0)
 	{
 		ft_putstr_fd("Pipe:", 2);
 		return (EXIT_FAILURE);
 	}
-	if (cmds->fdout == -1)
+	if (cmds->fdout == -5)
 		cmds->fdout = pipefd[1];
 	dup2(cmds->fdin, 0);
 	close(cmds->fdin);
@@ -201,17 +200,17 @@ void	openfiles(int *fds, char **av, int ac)
 		exit(EXIT_FAILURE);
 	}
 	fds[STDIN_FILENO] = open(av[1], O_RDONLY);
+	fds[STDOUT_FILENO] = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fds[STDIN_FILENO] < 0)
 	{
-		ft_printf("%s: %s\n", av[1], strerror(errno));
-		exit(EXIT_FAILURE);
+		int input_error = errno; // Save the errno for the input operation
+		perror(av[1]);
+		ft_printf("%s: %s\n", av[0], strerror(input_error));
 	}
-	fds[STDOUT_FILENO] = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fds[STDOUT_FILENO] < 0)
 	{
-		ft_printf("%s: %s\n", av[ac - 1], strerror(errno));
-		close(fds[STDIN_FILENO]);
-		exit(EXIT_FAILURE);
+		int output_error = errno; // Save the errno for the output operation
+		ft_printf("%s: %s\n", av[ac-1], strerror(output_error));
 	}
 }
 

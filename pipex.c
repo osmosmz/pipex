@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/01 20:41:27 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/02 02:18:17 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,11 @@
 void	cleanup(t_cmd *cmds, int totalcommands, int *fds, int type)
 {
 	freecmds(cmds, totalcommands);
-	close(fds[STDIN_FILENO]);
-	close(fds[STDOUT_FILENO]);
+	if (fds)
+	{
+		close(fds[STDIN_FILENO]);
+		close(fds[STDOUT_FILENO]);
+	}
 	if (type == EXIT_FAILURE)
 	{
 		ft_putstr_fd(strerror(errno), 2);
@@ -123,7 +126,7 @@ int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 	int		pipefd[2];
 	pid_t	pid[totalcmds];
 
-	(void)status;
+	*status = EXIT_FAILURE;
 	i = 0;
 	while (i < totalcmds)
 	{
@@ -136,32 +139,32 @@ int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 			return (EXIT_FAILURE);
 		}
 		else if (pid[i] == 0)
-			execve(cmds[i].bin, cmds[i].argv, envp);
+		{
+			if (cmds[i].fdin == -1 || cmds[i].fdout == -1)
+				exit(EXIT_FAILURE);
+			if (!cmds[i].bin)
+			{
+				ft_putstr_fd("argv[0]", 2);
+				ft_putendl_fd("command not found", 2);
+				cleanup(cmds, totalcmds, NULL, 127);
+			}
+			if (execve(cmds[i].bin, cmds[i].argv, envp) == -1)
+			{
+				ft_putstr_fd("execve", 2);
+				cleanup(cmds, totalcmds, NULL, EXIT_FAILURE);
+			}
+		}
 		i++;
 	}
 	i = -1;
-
-		if (waitpid(pid[0], status, 0) == -1)
+	while (++i < totalcmds)
+	{
+		if (waitpid(pid[i], status, 0) == -1)
 		{
 			perror("waitpid");
 			exit(EXIT_FAILURE);
 		}
-		if (waitpid(pid[1], status, 0) == -1)
-		{
-			perror("waitpid");
-			exit(EXIT_FAILURE);
-		}
-	
-	// while (++i < totalcmds)
-	// {
-	// 	if (waitpid(pid[i], status, 0) == -1)
-	// 	{
-	// 		perror("waitpid");
-	// 		exit(EXIT_FAILURE);
-	// 	}
-		
-	// }
-	//	
+	}
 	return (EXIT_SUCCESS);
 }
 

@@ -1,111 +1,47 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
+#include <string.h>
+#include <errno.h>
 #include <fcntl.h>
 
-typedef struct {
-    char *cmd;
-    char *args[10];
-} Command;
+int main() {
+    // The command and arguments to execute
+    char *command = "/usr/bin/bat"; // Full path to the 'bat' executable
+    char *args[] = { "bat", NULL }; // Arguments for 'bat'
 
+    // The input file to redirect from
+    char *input_file = "infile.txt";
 
-void	execute_commands(Command commands[], int num_commands, char *input_file,
-		char *output_file)
-{
-	int		i;
-	int		num_pipes;
-	int		pipes[num_pipes][2];
-	pid_t	pid;
-	int		input_fd;
-	int		output_fd;
+    // Open the input file for reading
+    int fd = open(input_file, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
 
-	num_pipes = num_commands - 1;
-	// Create the pipes
-	for (i = 0; i < num_pipes; ++i)
-	{
-		if (pipe(pipes[i]) == -1)
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
-	}
-	for (i = 0; i < num_commands; ++i)
-	{
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			exit(EXIT_FAILURE);
-		}
-		else if (pid == 0)
-		{
-			// Child process
-			if (i == 0)
-			{
-				// First command: read from input_file
-				input_fd = open(input_file, O_RDONLY);
-				if (input_fd == -1)
-				{
-					perror("open input_file");
-					exit(EXIT_FAILURE);
-				}
-				dup2(input_fd, STDIN_FILENO);
-				close(input_fd);
-			}
-			else
-			{
-				// Read from previous pipe
-				dup2(pipes[i - 1][0], STDIN_FILENO);
-			}
-			if (i == num_commands - 1)
-			{
-				// Last command: write to output_file
-				output_fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC,
-						0644);
-				if (output_fd == -1)
-				{
-					perror("open output_file");
-					exit(EXIT_FAILURE);
-				}
-				dup2(output_fd, STDOUT_FILENO);
-				close(output_fd);
-			}
-			else
-			{
-				// Write to next pipe
-				dup2(pipes[i][1], STDOUT_FILENO);
-			}
-			// Close all pipe file descriptors
-			for (int j = 0; j < num_pipes; ++j)
-			{
-				close(pipes[j][0]);
-				close(pipes[j][1]);
-			}
-			// Execute command
-			execvp(commands[i].cmd, commands[i].args);
-			perror("execvp");
-			exit(EXIT_FAILURE);
-		}
-	}
-	// Parent process: close all pipe file descriptors
-	for (i = 0; i < num_pipes; ++i)
-	{
-		close(pipes[i][0]);
-		close(pipes[i][1]);
-	}
-	// Wait for all child processes to finish
-	for (i = 0; i < num_commands; ++i)
-	{
-		wait(NULL);
-	}
-}
+    // Duplicate the file descriptor to stdin (fd 0)
+    if (dup2(fd, STDIN_FILENO) == -1) {
+        perror("dup2");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
 
-int	main(void)
-{
-	Command	commands[3] = {{"ls", {"ls", NULL}}, {"grep", {"grep", "main",
-			NULL}}, {"wc", {"wc", "-l", NULL}}};
+    // Close the original file descriptor
+    close(fd);
 
-	execute_commands(commands, 3, "input.txt", "output.txt");
-	return (0);
+    // Execute the command
+    execve(command, args, NULL);
+
+    // If execve returns, it must have failed
+    if (errno == ENOENT) {
+        // ENOENT indicates the file was not found
+        fprintf(stderr, "%s: command not found\n", args[0]);
+    } else {
+        // For other errors, print the error message
+        perror("execve");
+    }
+
+    // Exit with the appropriate error code
+    exit(errno);
 }

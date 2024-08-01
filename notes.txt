@@ -1,0 +1,32 @@
+< invalidfile "cat" | wc -l > outfile
+bash: invalidfile: No such file or directory
+return value: 0
+
+
+< infile.txt "cat" | wc -l > outfile
+no error msg
+return value: 0
+
+< invalidfile "cat" | "bat" > outfile
+bash: invalidfile: No such file or directory
+Command 'bat' not found
+return value: 127
+
+< invalidfile "cat" | wc -l > invalidoutfile
+bash: invalidfile: No such file or directory
+bash: invalidoutfile.txt: Permission denied
+
+return value: 1
+
+< infile.txt "cat" | "bat" > invalidoutfile.txt 
+bash: invalidoutfile.txt: Permission denied
+
+return value: 1
+
+in general return value = status of last Command
+if invalid read or write, command is not run, exit straight away before running execvp
+
+
+
+
+

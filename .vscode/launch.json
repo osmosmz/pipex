@@ -20,7 +20,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["infile.txt" ,"bat" ,"cat", "outfile"],
+            "args": ["a" ,"cat" ,"ls", "outfile"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

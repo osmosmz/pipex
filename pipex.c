@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/07/30 23:06:27 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/01 20:41:27 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 	int		pipefd[2];
 	pid_t	pid[totalcmds];
 
+	(void)status;
 	i = 0;
 	while (i < totalcmds)
 	{
@@ -139,8 +140,28 @@ int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 		i++;
 	}
 	i = -1;
-	while (++i < totalcmds)
-		waitpid(pid[i], status, 0);
+
+		if (waitpid(pid[0], status, 0) == -1)
+		{
+			perror("waitpid");
+			exit(EXIT_FAILURE);
+		}
+		if (waitpid(pid[1], status, 0) == -1)
+		{
+			perror("waitpid");
+			exit(EXIT_FAILURE);
+		}
+	
+	// while (++i < totalcmds)
+	// {
+	// 	if (waitpid(pid[i], status, 0) == -1)
+	// 	{
+	// 		perror("waitpid");
+	// 		exit(EXIT_FAILURE);
+	// 	}
+		
+	// }
+	//	
 	return (EXIT_SUCCESS);
 }
 
@@ -200,18 +221,11 @@ void	openfiles(int *fds, char **av, int ac)
 		exit(EXIT_FAILURE);
 	}
 	fds[STDIN_FILENO] = open(av[1], O_RDONLY);
-	fds[STDOUT_FILENO] = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fds[STDIN_FILENO] < 0)
-	{
-		int input_error = errno; // Save the errno for the input operation
 		perror(av[1]);
-		ft_printf("%s: %s\n", av[0], strerror(input_error));
-	}
+	fds[STDOUT_FILENO] = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fds[STDOUT_FILENO] < 0)
-	{
-		int output_error = errno; // Save the errno for the output operation
-		ft_printf("%s: %s\n", av[ac-1], strerror(output_error));
-	}
+		perror(av[ac - 1]);
 }
 
 void	updatefds(t_cmd *cmds, int *fds, int totalcommands)

@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/02 02:18:17 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/02 12:26:03 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ void	getbin(t_cmd *comd, char **path)
 	}
 	if (!(comd->bin))
 	{
-		ft_printf("%s: %s\n", comd->argv[0], "command not found");
+		ft_putstr_fd("argv[0]", 2);
+		ft_putendl_fd("command not found", 2);
 	}
 }
 
@@ -143,11 +144,7 @@ int	pipex(t_cmd *cmds, int totalcmds, char **envp, int *status)
 			if (cmds[i].fdin == -1 || cmds[i].fdout == -1)
 				exit(EXIT_FAILURE);
 			if (!cmds[i].bin)
-			{
-				ft_putstr_fd("argv[0]", 2);
-				ft_putendl_fd("command not found", 2);
 				cleanup(cmds, totalcmds, NULL, 127);
-			}
 			if (execve(cmds[i].bin, cmds[i].argv, envp) == -1)
 			{
 				ft_putstr_fd("execve", 2);

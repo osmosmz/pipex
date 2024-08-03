@@ -6,25 +6,24 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/07/21 15:57:02 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/08/03 17:21:35 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRC			= pipex.c
-# SRC2 		= stack_util.c ft_mergesort.c parse_checks.c freeinput.c sortstacks.c pushfunctions.c \
-# 				rotatefunctions.c revrotatefunctions.c swapfunctions.c  stackfunctions.c \
-# 				parse_input.c sortstacks2.c 
+SRC2 		= parsecommand.c cleanup.c
+
 NAME 		= pipex
 OBJ1		= ${SRC:.c=.o}
-# OBJ2		= ${SRC2:.c=.o}
+OBJ2		= ${SRC2:.c=.o}
 LIBDIR		= libft
 LIBNAME		= libft/libft.a
 LIBINC 		= -L ./libft -lft
 CC			= cc
 RM			= rm -rf
 CFLAGS		= -Wall -Wextra -Werror -g
-# B_NAME	= checker
-# B_SRC	= checker_bonus.c
+# B_NAME	= pipex_bonus
+# B_SRC	= pipex_bonus.c
 # B_OBJ	= ${B_SRC:.c=.o}
 
 
@@ -33,14 +32,14 @@ all:		$(NAME)
 $(LIBNAME):
 	$(MAKE) -C $(LIBDIR)
 
-$(NAME):	${OBJ1} $(LIBNAME)
-			${CC} ${CFLAGS} ${OBJ1} -o $@ ${LIBINC}
+$(NAME):	${OBJ1} ${OBJ2} $(LIBNAME)
+			${CC} ${CFLAGS} ${OBJ1} ${OBJ2} -o $@ ${LIBINC}
 
 %.o : %.c
 			${CC} ${CFLAGS} -c -I${LIBDIR} -o $@ $< 
 
 clean:
-			${RM} ${OBJ1}
+			${RM} ${OBJ1} ${OBJ2}
 			${MAKE} -C $(LIBDIR) clean
 
 

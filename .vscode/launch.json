@@ -20,7 +20,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["a" ,"cat" ,"ls", "outfile"],
+            "args": ["infile.txt" ,"cat" ,"cat","cat", "b"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -35,15 +35,15 @@
                 {
                     // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
                     "description": "Fork follows Child process",
-                    "text": "set follow-fork-mode parent",
+                    "text": "set follow-fork-mode child",
+                    "ignoreFailures": true
+                },
+                {
+                    // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
+                    "description": "Fork will keep the other process attached to debugger",
+                    "text": "set detach-on-fork off",
                     "ignoreFailures": true
                 }
-                // {
-                //     // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
-                //     "description": "Fork will keep the other process attached to debugger",
-                //     "text": "set detach-on-fork off",
-                //     "ignoreFailures": true
-                // }
             ],
             "preLaunchTask": "Build using Make",
             "miDebuggerPath": "/usr/bin/gdb",

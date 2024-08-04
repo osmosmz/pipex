@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 13:54:53 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/03 17:24:04 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,38 +68,37 @@ void	freepath(char **path)
 	free(path);
 }
 
-void	parsecmds(t_cmd *cmds, t_context *ctx)
+void	parsecmds(t_cmd *cmds, char **envp, char **av, int totalcommands)
 {
 	char	**path;
 	int		i;
 
-	path = parsepath(ctx->envp);
+	path = parsepath(envp);
 	i = 0;
-	while (i < ctx->totalcommands)
+	while (i < totalcommands)
 	{
 		cmds[i].bin = NULL;
 		cmds[i].cmdnumber = i + 1;
 		cmds[i].fdin = -5;
 		cmds[i].fdout = -5;
-		cmds[i].argv = ft_split(ctx->av[cmds[i].cmdnumber + ctx->heredoc + 1],
-				' ');
+		cmds[i].argv = ft_split(av[cmds[i].cmdnumber + 1], ' ');
 		getbin(cmds + i, path);
 		i++;
 	}
 	freepath(path);
 }
 
-void	updatefds(t_cmd *cmds, t_context *ctx)
+void	updatefds(t_cmd *cmds, int *fds, int totalcommands)
 {
 	int	i;
 
 	i = 0;
-	while (i < ctx->totalcommands)
+	while (i < totalcommands)
 	{
 		if (cmds[i].cmdnumber == 1)
-			cmds[i].fdin = ctx->fds[STDIN_FILENO];
-		if (cmds[i].cmdnumber == ctx->totalcommands)
-			cmds[i].fdout = ctx->fds[STDOUT_FILENO];
+			cmds[i].fdin = fds[STDIN_FILENO];
+		if (cmds[i].cmdnumber == totalcommands)
+			cmds[i].fdout = fds[STDOUT_FILENO];
 		i++;
 	}
 }

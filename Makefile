@@ -6,11 +6,11 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/08/03 17:21:35 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/08/04 14:16:31 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRC			= pipex.c
+SRC			= pipex.c heredoc.c
 SRC2 		= parsecommand.c cleanup.c
 
 NAME 		= pipex

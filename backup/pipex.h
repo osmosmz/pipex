@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:20:08 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 14:24:21 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/03 16:36:21 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,29 +33,14 @@ typedef struct s_cmd
 
 }			t_cmd;
 
-typedef struct s_context
-{
-	char	**av;
-	char	**envp;
-	int		ac;
-	int		heredoc;
-	int		totalcommands;
-	int		fds[2];
-	int		status;
-
-}			t_context;
-
 void		closefds(int *fds);
-void		pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage);
+void		cleanup(t_cmd *cmds, int totalcommands, int type, int printmessage);
 void		freecmds(t_cmd *cmds, int totalcommands);
 
 char		**parsepath(char **envp);
 void		getbin(t_cmd *comd, char **path);
 void		freepath(char **path);
-void		parsecmds(t_cmd *cmds, t_context *ctx);
-void		updatefds(t_cmd *cmds, t_context *ctx);
-
-void	makeheredoc(t_context *ctx);
-
+void		parsecmds(t_cmd *cmds, char **envp, char **av, int totalcommands);
+void		updatefds(t_cmd *cmds, int *fds, int totalcommands);
 
 #endif

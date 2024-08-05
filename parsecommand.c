@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 13:54:53 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/05 21:09:10 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,21 +51,8 @@ void	getbin(t_cmd *comd, char **path)
 	{
 		if (comd->argv[0])
 			ft_putstr_fd(comd->argv[0], 2);
-		ft_putendl_fd("command not found", 2);
+		ft_putendl_fd(":command not found", 2);
 	}
-}
-
-void	freepath(char **path)
-{
-	int	i;
-
-	i = 0;
-	while (path[i])
-	{
-		free(path[i]);
-		i++;
-	}
-	free(path);
 }
 
 void	parsecmds(t_cmd *cmds, t_context *ctx)

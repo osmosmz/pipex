@@ -20,7 +20,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["infile.txt" ,"cat" ,"cat","cat", "b"],
+            "args": ["here_doc", "EOF" ,"cat" ,"wc -l", "b"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -35,7 +35,7 @@
                 {
                     // https://sourceware.org/gdb/onlinedocs/gdb/Forks.html
                     "description": "Fork follows Child process",
-                    "text": "set follow-fork-mode child",
+                    "text": "set follow-fork-mode parent",
                     "ignoreFailures": true
                 },
                 {

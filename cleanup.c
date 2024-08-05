@@ -6,15 +6,15 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:10:39 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 14:24:10 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/05 21:05:36 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	pipecleanup(t_cmd *cmds, t_context* ctx, int type, int printmessage)
+void	pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage)
 {
-	if(ctx->heredoc)
+	if (ctx->heredoc)
 		unlink("here_doc");
 	freecmds(cmds, ctx->totalcommands);
 	if (type == EXIT_FAILURE && printmessage == PRINTERRORMSG)
@@ -59,4 +59,17 @@ void	closefds(int *fds)
 		close(fds[STDIN_FILENO]);
 	if (fds[STDOUT_FILENO] != -1)
 		close(fds[STDOUT_FILENO]);
+}
+
+void	freepath(char **path)
+{
+	int	i;
+
+	i = 0;
+	while (path[i])
+	{
+		free(path[i]);
+		i++;
+	}
+	free(path);
 }

@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:20:08 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 14:24:21 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/05 21:00:09 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ typedef struct s_context
 }			t_context;
 
 void		closefds(int *fds);
-void		pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage);
+void		pipecleanup(t_cmd *cmds, t_context *ctx, int type,
+				int printmessage);
 void		freecmds(t_cmd *cmds, int totalcommands);
 
 char		**parsepath(char **envp);
@@ -55,7 +56,6 @@ void		freepath(char **path);
 void		parsecmds(t_cmd *cmds, t_context *ctx);
 void		updatefds(t_cmd *cmds, t_context *ctx);
 
-void	makeheredoc(t_context *ctx);
-
+void		makeheredoc(t_context *ctx);
 
 #endif

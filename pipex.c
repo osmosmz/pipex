@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/04 14:23:22 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/05 21:07:43 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,16 @@ int	executecmd(t_cmd *cmds, int i, pid_t *pid, t_context *ctx)
 	else if (pid[i] == 0)
 	{
 		if (cmds[i].fdin == -1 || cmds[i].fdout == -1)
-			cleanup(cmds, ctx, EXIT_FAILURE, SKIPERRORMSG);
+			pipecleanup(cmds, ctx, EXIT_FAILURE, SKIPERRORMSG);
 		if (!cmds[i].bin)
-			cleanup(cmds, ctx, 127, SKIPERRORMSG);
+			pipecleanup(cmds, ctx, 127, SKIPERRORMSG);
 		if (execve(cmds[i].bin, cmds[i].argv, ctx->envp) == -1)
 		{
 			ft_putstr_fd("execve", 2);
-			cleanup(cmds, ctx, EXIT_FAILURE, SKIPERRORMSG);
+			pipecleanup(cmds, ctx, EXIT_FAILURE, SKIPERRORMSG);
 		}
 	}
-	return(EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }
 
 int	pipex(t_cmd *cmds, t_context *ctx)
@@ -105,36 +105,31 @@ void	openfiles(t_context *ctx)
 		perror(ctx->av[ctx->ac - 1]);
 }
 
-void	updatectx(t_context *ctx, int ac, char **av, char **envp)
-{
-	ctx->status = EXIT_FAILURE;
-	if (ft_strncmp(av[1], "here_doc", 8) == 0)
-		ctx->heredoc = 1;
-	else
-		ctx->heredoc = 0;
-	ctx->ac = ac;
-	ctx->av = av;
-	ctx->envp = envp;
-	ctx->totalcommands = ac - OTHER_AC - ctx->heredoc;
-}
-
 int	main(int ac, char **av, char **envp)
 {
 	t_cmd		*cmds;
 	t_context	ctx;
 
-	updatectx(&ctx, ac, av, envp);
+	ctx.status = EXIT_FAILURE;
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+		ctx.heredoc = 1;
+	else
+		ctx.heredoc = 0;
+	ctx.ac = ac;
+	ctx.av = av;
+	ctx.envp = envp;
+	ctx.totalcommands = ac - OTHER_AC - ctx.heredoc;
 	openfiles(&ctx);
 	cmds = malloc(sizeof(t_cmd) * ctx.totalcommands);
 	if (!cmds)
 	{
 		closefds(ctx.fds);
-		cleanup(cmds, &ctx, EXIT_FAILURE, PRINTERRORMSG);
+		pipecleanup(cmds, &ctx, EXIT_FAILURE, PRINTERRORMSG);
 	}
 	parsecmds(cmds, &ctx);
 	updatefds(cmds, &ctx);
 	if (pipex(cmds, &ctx) == EXIT_FAILURE)
-		cleanup(cmds, &ctx, EXIT_FAILURE, PRINTERRORMSG);
+		pipecleanup(cmds, &ctx, EXIT_FAILURE, PRINTERRORMSG);
 	ctx.status = WEXITSTATUS(ctx.status);
-	cleanup(cmds, &ctx, ctx.status, SKIPERRORMSG);
+	pipecleanup(cmds, &ctx, ctx.status, SKIPERRORMSG);
 }

@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/05 21:09:10 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/13 20:44:22 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,14 +66,32 @@ void	parsecmds(t_cmd *cmds, t_context *ctx)
 	{
 		cmds[i].bin = NULL;
 		cmds[i].cmdnumber = i + 1;
-		cmds[i].fdin = -5;
-		cmds[i].fdout = -5;
+		cmds[i].fdin = UNINITIALISED;
+		cmds[i].fdout = UNINITIALISED;
 		cmds[i].argv = ft_split(ctx->av[cmds[i].cmdnumber + ctx->heredoc + 1],
 				' ');
 		getbin(cmds + i, path);
 		i++;
 	}
 	freepath(path);
+}
+
+int	createpipe(int *pipefd, t_cmd *cmds)
+{
+	if (cmds->fdin == UNINITIALISED)
+		cmds->fdin = pipefd[0];
+	if (pipe(pipefd) < 0)
+	{
+		ft_putstr_fd("Pipe:", 2);
+		return (EXIT_FAILURE);
+	}
+	if (cmds->fdout == UNINITIALISED)
+		cmds->fdout = pipefd[1];
+	if (dup2(cmds->fdin, 0) != -1)
+		close(cmds->fdin);
+	if (dup2(cmds->fdout, 1) != -1)
+		close(cmds->fdout);
+	return (EXIT_SUCCESS);
 }
 
 void	updatefds(t_cmd *cmds, t_context *ctx)

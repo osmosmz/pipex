@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:10:39 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/05 21:05:36 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/13 22:27:14 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void	pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage)
 	if (ctx->heredoc)
 		unlink("here_doc");
 	freecmds(cmds, ctx->totalcommands);
+	free(ctx->pid);
 	if (type == EXIT_FAILURE && printmessage == PRINTERRORMSG)
 	{
 		ft_putstr_fd(strerror(errno), 2);

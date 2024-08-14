@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:10:39 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/13 22:27:14 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:27:40 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage)
 {
+	closefds(ctx->fds);
+	closefds(ctx->pipefd);
 	if (ctx->heredoc)
 		unlink("here_doc");
 	freecmds(cmds, ctx->totalcommands);

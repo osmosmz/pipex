@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/13 22:56:07 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/14 19:56:38 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,11 @@ int	executecmd(t_cmd *cmds, int i, t_context *ctx)
 int	pipex(t_cmd *cmds, t_context *ctx)
 {
 	int	i;
-	int	pipefd[2];
 
 	i = -1;
 	while (++i < ctx->totalcommands)
 	{
-		if (createpipe(pipefd, cmds + i) == EXIT_FAILURE)
+		if (createpipe(ctx, cmds + i) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 		if (executecmd(cmds, i, ctx) == EXIT_FAILURE)
 			return (EXIT_FAILURE);

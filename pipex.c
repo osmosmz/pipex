@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/14 19:56:38 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/15 21:29:35 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,11 @@ void	initialisectx(t_context *ctx, int ac, char **av, char **envp)
 		exit(EXIT_FAILURE);
 	}
 	ctx->status = EXIT_FAILURE;
-	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+	if (ft_strncmp(av[1], "here_doc", 9) == 0)
 	{
 		if (ac < 6)
 		{
-			ft_putstr_fd("Usage: ./pipex here_doc LIMITER", 2);
+			ft_putstr_fd("Usage: ./pipex here_doc LIMITER ", 2);
 			ft_putendl_fd("cmd1 cmd2 ... outfile", 2);
 			exit(EXIT_FAILURE);
 		}

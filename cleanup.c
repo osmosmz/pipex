@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:10:39 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/14 19:27:40 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/15 22:39:29 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ void	pipecleanup(t_cmd *cmds, t_context *ctx, int type, int printmessage)
 	closefds(ctx->fds);
 	closefds(ctx->pipefd);
 	if (ctx->heredoc)
-		unlink("here_doc");
+		unlink(ctx->av[1]);
+	if (ctx->heredoc && ft_strncmp(ctx->av[1], "here_doc", 9) != 0)
+		free(ctx->av[1]);
 	freecmds(cmds, ctx->totalcommands);
 	free(ctx->pid);
 	if (type == EXIT_FAILURE && printmessage == PRINTERRORMSG)

@@ -6,7 +6,7 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/08/18 19:02:35 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/08/18 23:13:59 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ LIBINC 		= -L ./libft -lft
 CC			= cc
 RM			= rm -rf
 CFLAGS		= -Wall -Wextra -Werror -g
+LIBOBJ = $((MAKE) -C $(LIBDIR) -s list-objfiles)
 
 
 
@@ -27,7 +28,7 @@ all:		$(NAME)
 bonus: 	$(NAME)
 
 
-$(LIBNAME):
+$(LIBNAME): 
 	$(MAKE) -C $(LIBDIR)
 
 $(NAME):	${OBJ} $(LIBNAME)

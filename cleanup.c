@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:10:39 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/18 17:25:26 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/18 22:48:43 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,13 @@ void	freepath(char **path)
 	int	i;
 
 	i = 0;
-	while (path[i])
+	if (path)
 	{
-		free(path[i]);
-		i++;
+		while (path[i])
+		{
+			free(path[i]);
+			i++;
+		}
+		free(path);
 	}
-	free(path);
 }

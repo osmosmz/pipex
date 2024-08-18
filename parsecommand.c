@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/18 18:25:12 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/18 22:53:02 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,14 @@ char	**parsepath(char **envp)
 	int	i;
 
 	i = 0;
-	while (envp[i])
+	if (envp)
 	{
-		if (ft_strnstr(envp[i], "PATH", 4))
-			return (ft_split(&envp[i][5], ':'));
-		i++;
+		while (envp[i])
+		{
+			if (ft_strnstr(envp[i], "PATH", 4))
+				return (ft_split(&envp[i][5], ':'));
+			i++;
+		}
 	}
 	return (NULL);
 }

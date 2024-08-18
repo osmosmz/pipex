@@ -20,7 +20,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/pipex",
-            "args": ["here_doc", "EOF", "cat","cat" ,"wc -l", "outfile"],
+            "args": ["in_file", "cat","", "outfile"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

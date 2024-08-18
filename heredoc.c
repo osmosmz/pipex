@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 12:52:02 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/15 22:46:59 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/18 16:57:12 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,6 @@ void	makeheredoc(t_context *ctx)
 	ctx->fds[0] = open(ctx->av[1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	ctx->fds[1] = open(ctx->av[ctx->ac - 1], O_CREAT | O_WRONLY | O_APPEND,
 			0644);
-	if (ctx->fds[0] < 0)
-		perror(ctx->av[1]);
-	if (ctx->fds[1] < 0)
-		perror(ctx->av[ctx->ac - 1]);
 	while (1)
 	{
 		buf = get_next_line(0);
@@ -61,6 +57,4 @@ void	makeheredoc(t_context *ctx)
 	free(buf);
 	close(ctx->fds[0]);
 	ctx->fds[0] = open(ctx->av[1], O_RDONLY);
-	if (ctx->fds[0] < 0)
-		perror(ctx->av[1]);
 }

@@ -6,7 +6,7 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/08/14 18:50:40 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/08/18 19:02:35 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,9 +20,12 @@ CC			= cc
 RM			= rm -rf
 CFLAGS		= -Wall -Wextra -Werror -g
 
+
+
 all:		$(NAME)
 
 bonus: 	$(NAME)
+
 
 $(LIBNAME):
 	$(MAKE) -C $(LIBDIR)

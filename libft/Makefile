@@ -56,6 +56,10 @@ SUBDIRSOBJ = $(foreach subdir, $(SUBDIRS), $(shell $(MAKE) -C $(subdir) -s list-
 
 all: $(NAME)
 
+list-objfiles: $(OBJ) $(SUBDIRSOBJ)
+	@echo $(OBJ) | tr ' ' '\n'
+	@echo $(SUBDIRSOBJ) | tr ' ' '\n'
+
 $(NAME): $(OBJ) subdir-objfiles 
 	@for subdir in $(SUBDIRS); do \
 		$(MAKE) -C $$subdir; \
@@ -93,4 +97,6 @@ re: fclean all
 		$(MAKE) -C $$subdir; \
 	done
 
-.PHONY: all clean fclean re subdir-objfiles
+
+
+.PHONY: all clean fclean re subdir-objfiles list-objfiles

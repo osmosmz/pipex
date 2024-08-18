@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/14 19:27:15 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/18 18:25:12 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,12 @@ void	getbin(t_cmd *comd, char **path)
 	char	*actualpath;
 	char	*pathwithslash;
 
-	if (comd->argv[0])
+	if (comd->argv[0] && ft_strchr(comd->argv[0], '/'))
+	{
+		if (access(comd->argv[0], F_OK) != -1)
+			comd->bin = ft_strdup(comd->argv[0]);
+	}
+	else if (comd->argv[0] && path)
 	{
 		while (*path)
 		{
@@ -42,16 +47,9 @@ void	getbin(t_cmd *comd, char **path)
 				comd->bin = actualpath;
 			if (access(actualpath, F_OK) != -1)
 				break ;
-			else
-				free(actualpath);
+			free(actualpath);
 			path++;
 		}
-	}
-	if (!(comd->bin))
-	{
-		if (comd->argv[0])
-			ft_putstr_fd(comd->argv[0], 2);
-		ft_putendl_fd(":command not found", 2);
 	}
 }
 
@@ -66,11 +64,16 @@ void	parsecmds(t_cmd *cmds, t_context *ctx)
 	{
 		cmds[i].bin = NULL;
 		cmds[i].cmdnumber = i + 1;
-		cmds[i].fdin = UNINITIALISED;
-		cmds[i].fdout = UNINITIALISED;
+		updatefds(cmds, i, ctx);
 		cmds[i].argv = ft_split(ctx->av[cmds[i].cmdnumber + ctx->heredoc + 1],
 				' ');
 		getbin(cmds + i, path);
+		if (!(cmds[i].bin) && cmds[i].fdin != -1 && cmds[i].fdout != -1)
+		{
+			if (cmds[i].argv[0])
+				ft_putstr_fd(cmds[i].argv[0], 2);
+			ft_putendl_fd(":command not found", 2);
+		}
 		i++;
 	}
 	freepath(path);
@@ -94,17 +97,14 @@ int	createpipe(t_context *ctx, t_cmd *cmds)
 	return (EXIT_SUCCESS);
 }
 
-void	updatefds(t_cmd *cmds, t_context *ctx)
+void	updatefds(t_cmd *cmds, int i, t_context *ctx)
 {
-	int	i;
-
-	i = 0;
-	while (i < ctx->totalcommands)
-	{
-		if (cmds[i].cmdnumber == 1)
-			cmds[i].fdin = ctx->fds[STDIN_FILENO];
-		if (cmds[i].cmdnumber == ctx->totalcommands)
-			cmds[i].fdout = ctx->fds[STDOUT_FILENO];
-		i++;
-	}
+	if (cmds[i].cmdnumber == 1)
+		cmds[i].fdin = ctx->fds[STDIN_FILENO];
+	else
+		cmds[i].fdin = UNINITIALISED;
+	if (cmds[i].cmdnumber == ctx->totalcommands)
+		cmds[i].fdout = ctx->fds[STDOUT_FILENO];
+	else
+		cmds[i].fdout = UNINITIALISED;
 }

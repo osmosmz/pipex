@@ -6,7 +6,7 @@
 #    By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/06 16:08:12 by mzhuang           #+#    #+#              #
-#    Updated: 2024/08/18 23:13:59 by mzhuang          ###   ########.fr        #
+#    Updated: 2024/08/20 09:14:48 by mzhuang          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ $(LIBNAME):
 $(NAME):	${OBJ} $(LIBNAME)
 			${CC} ${CFLAGS} ${OBJ} -o $@ ${LIBINC}
 
-%.o : %.c
+%.o : %.c pipex.h
 			${CC} ${CFLAGS} -c -I${LIBDIR} -o $@ $< 
 
 clean:

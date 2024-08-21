@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/18 18:22:43 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/21 15:02:36 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,8 +104,13 @@ int	main(int ac, char **av, char **envp)
 	t_context	ctx;
 
 	initialisectx(&ctx, ac, av, envp);
-	if (!ctx.pid || !envp[0] || !envp)
+	if (!ctx.pid)
 		return (EXIT_FAILURE);
+	if (!envp[0] || !envp)
+	{
+		ft_putstr_fd("Error!No Env!\n", 2);
+		return (EXIT_FAILURE);
+	}
 	openfiles(&ctx);
 	cmds = malloc(sizeof(t_cmd) * ctx.totalcommands);
 	if (!cmds)

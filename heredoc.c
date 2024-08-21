@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 12:52:02 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/18 16:57:12 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/21 19:56:41 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ void	makeheredoc(t_context *ctx)
 		buf = get_next_line(0);
 		if (!buf)
 			break ;
-		if (ft_strncmp(buf, ctx->av[2], ft_strlen(ctx->av[2]) + 1) == '\n')
+		if (ft_strlen(buf) - ft_strlen(ctx->av[2]) == 1 && ft_strncmp(buf,
+				ctx->av[2], ft_strlen(ctx->av[2]) + 1) == '\n')
 			break ;
 		write(ctx->fds[0], buf, ft_strlen(buf));
 		free(buf);

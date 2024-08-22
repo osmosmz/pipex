@@ -6,11 +6,40 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/21 15:02:36 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/22 12:57:03 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+void	openfiles(t_context *ctx, t_cmd *cmd)
+{
+	if (cmd->cmdnumber == 1)
+	{
+		if (ctx->heredoc == 1)
+			makeheredoc(ctx);
+		else
+			ctx->fds[0] = open(ctx->av[1], O_RDONLY);
+		if (ctx->fds[0] < 0)
+			perror(ctx->av[1]);
+	}
+	dup2(ctx->fds[0], 0);
+	close(ctx->fds[0]);
+	if (cmd->cmdnumber == ctx->totalcommands)
+	{
+		if (ctx->heredoc == 1)
+			ctx->fds[1] = open(ctx->av[ctx->ac - 1],
+					O_CREAT | O_WRONLY | O_APPEND, 0644);
+		else
+			ctx->fds[1] = open(ctx->av[ctx->ac - 1],
+					O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		if (ctx->fds[1] < 0)
+			perror(ctx->av[ctx->ac - 1]);
+	}
+	createpipe(ctx);
+	dup2(ctx->fds[1], 1);
+	close(ctx->fds[1]);
+}
 
 int	executecmd(t_cmd *cmds, int i, t_context *ctx)
 {
@@ -19,10 +48,10 @@ int	executecmd(t_cmd *cmds, int i, t_context *ctx)
 		return (EXIT_FAILURE);
 	else if (ctx->pid[i] == 0)
 	{
-		if (cmds[i].fdin == -1 || cmds[i].fdout == -1)
+		if (ctx->fds[0] == -1 || ctx->fds[1] == -1)
 			pipecleanup(cmds, ctx, EXIT_FAILURE, SKIPERRORMSG);
 		if (!cmds[i].bin)
-			pipecleanup(cmds, ctx, 127, SKIPERRORMSG);
+			pipecleanup(cmds, ctx, 127, PRINTERRORMSG);
 		if (execve(cmds[i].bin, cmds[i].argv, ctx->envp) == -1)
 		{
 			ft_putstr_fd("execve", 2);
@@ -39,8 +68,7 @@ int	pipex(t_cmd *cmds, t_context *ctx)
 	i = -1;
 	while (++i < ctx->totalcommands)
 	{
-		if (createpipe(ctx, cmds + i) == EXIT_FAILURE)
-			return (EXIT_FAILURE);
+		openfiles(ctx, cmds + i);
 		if (executecmd(cmds, i, ctx) == EXIT_FAILURE)
 			return (EXIT_FAILURE);
 	}
@@ -53,22 +81,6 @@ int	pipex(t_cmd *cmds, t_context *ctx)
 			return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
-}
-
-void	openfiles(t_context *ctx)
-{
-	if (ctx->heredoc == 1)
-		makeheredoc(ctx);
-	else
-	{
-		ctx->fds[0] = open(ctx->av[1], O_RDONLY);
-		ctx->fds[1] = open(ctx->av[ctx->ac - 1], O_CREAT | O_WRONLY | O_TRUNC,
-				0644);
-	}
-	if (ctx->fds[0] < 0)
-		perror(ctx->av[1]);
-	if (ctx->fds[1] < 0)
-		perror(ctx->av[ctx->ac - 1]);
 }
 
 void	initialisectx(t_context *ctx, int ac, char **av, char **envp)
@@ -111,7 +123,6 @@ int	main(int ac, char **av, char **envp)
 		ft_putstr_fd("Error!No Env!\n", 2);
 		return (EXIT_FAILURE);
 	}
-	openfiles(&ctx);
 	cmds = malloc(sizeof(t_cmd) * ctx.totalcommands);
 	if (!cmds)
 	{

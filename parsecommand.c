@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/03 16:03:12 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/18 22:53:02 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/22 12:58:09 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,47 +67,30 @@ void	parsecmds(t_cmd *cmds, t_context *ctx)
 	{
 		cmds[i].bin = NULL;
 		cmds[i].cmdnumber = i + 1;
-		updatefds(cmds, i, ctx);
+		// updatefds(cmds, i, ctx);
 		cmds[i].argv = ft_split(ctx->av[cmds[i].cmdnumber + ctx->heredoc + 1],
 				' ');
 		getbin(cmds + i, path);
-		if (!(cmds[i].bin) && cmds[i].fdin != -1 && cmds[i].fdout != -1)
-		{
-			if (cmds[i].argv[0])
-				ft_putstr_fd(cmds[i].argv[0], 2);
-			ft_putendl_fd(":command not found", 2);
-		}
+		// if (!(cmds[i].bin) && cmds[i].fdin != -1 && cmds[i].fdout != -1)
+		// {
+		// 	if (cmds[i].argv[0])
+		// 		ft_putstr_fd(cmds[i].argv[0], 2);
+		// 	ft_putendl_fd(":command not found", 2);
+		// }
 		i++;
 	}
 	freepath(path);
 }
 
-int	createpipe(t_context *ctx, t_cmd *cmds)
+void	createpipe(t_context *ctx)
 {
-	if (cmds->fdin == UNINITIALISED)
-		cmds->fdin = ctx->pipefd[0];
-	if (pipe(ctx->pipefd) < 0)
-	{
-		ft_putstr_fd("Pipe:", 2);
-		return (EXIT_FAILURE);
-	}
-	if (cmds->fdout == UNINITIALISED)
-		cmds->fdout = ctx->pipefd[1];
-	if (dup2(cmds->fdin, 0) != -1)
-		close(cmds->fdin);
-	if (dup2(cmds->fdout, 1) != -1)
-		close(cmds->fdout);
-	return (EXIT_SUCCESS);
-}
+	int	pipefd[2];
 
-void	updatefds(t_cmd *cmds, int i, t_context *ctx)
-{
-	if (cmds[i].cmdnumber == 1)
-		cmds[i].fdin = ctx->fds[STDIN_FILENO];
-	else
-		cmds[i].fdin = UNINITIALISED;
-	if (cmds[i].cmdnumber == ctx->totalcommands)
-		cmds[i].fdout = ctx->fds[STDOUT_FILENO];
-	else
-		cmds[i].fdout = UNINITIALISED;
+	if (pipe(pipefd) < 0)
+	{
+		ft_putstr_fd("Create pipe error", 2);
+		exit(EXIT_FAILURE);
+	}
+	ctx->fds[0] = pipefd[0];
+	ctx->fds[1] = pipefd[1];
 }

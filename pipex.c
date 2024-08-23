@@ -6,7 +6,7 @@
 /*   By: mzhuang <mzhuang@student.42singapore.sg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 18:19:54 by mzhuang           #+#    #+#             */
-/*   Updated: 2024/08/22 12:57:03 by mzhuang          ###   ########.fr       */
+/*   Updated: 2024/08/22 13:26:06 by mzhuang          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ void	openfiles(t_context *ctx, t_cmd *cmd)
 		if (ctx->fds[1] < 0)
 			perror(ctx->av[ctx->ac - 1]);
 	}
-	createpipe(ctx);
+	else
+		createpipe(ctx);
 	dup2(ctx->fds[1], 1);
 	close(ctx->fds[1]);
 }
@@ -77,8 +78,7 @@ int	pipex(t_cmd *cmds, t_context *ctx)
 	i = -1;
 	while (++i < ctx->totalcommands - 1)
 	{
-		if (waitpid(ctx->pid[i], NULL, WNOHANG) == -1)
-			return (EXIT_FAILURE);
+wait(0); // this waiting still does not work properly
 	}
 	return (EXIT_SUCCESS);
 }
